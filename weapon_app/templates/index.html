@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weapon Threat Detection System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        img, video {
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .alert-box {
+            padding: 15px;
+            margin-top: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            color: white;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .green { background-color: #28a745; }
+        .red { background-color: #dc3545; }
+        .orange { background-color: #fd7e14; }
+
+        .snapshot-title {
+            margin-top: 30px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Weapon Threat Detection System</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if result_file %}
+        <h3>Detection Result:</h3>
+
+        {% if is_video %}
+            <video width="600" controls>
+                <source src="{{ url_for('static', filename=result_file) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% else %}
+            <img src="{{ url_for('static', filename=result_file) }}" width="500">
+        {% endif %}
+
+        {% if snapshot_file %}
+            <div class="snapshot-title">🚨 Threat Snapshot</div>
+            <img src="{{ url_for('static', filename=snapshot_file) }}" width="500">
+        {% endif %}
+
+        <div class="alert-box {{ color }}">
+            {{ threat }}
+        </div>
+    {% endif %}
+
+</body>
+</html>
