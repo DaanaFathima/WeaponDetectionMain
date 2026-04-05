@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from ultralytics import YOLO
 from deepface import DeepFace
 import os
@@ -21,6 +21,13 @@ os.makedirs(STATIC_FOLDER, exist_ok=True)
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
+
+@app.route("/known_faces/<filename>")
+def serve_known_face(filename):
+    # Use absolute path to ensure the folder is found regardless of where the script is run from
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    known_faces_dir = os.path.join(base_dir, "known_faces")
+    return send_from_directory(known_faces_dir, filename)
 
 def process_detections(img, boxes):
     """Filters false positives, draws boxes manually, and returns valid detected classes."""
@@ -63,6 +70,7 @@ def analyze():
     snapshot_files = []
     original_filename = ""
     identified_person = "Unknown"
+    match_image_file = None
     criminal_record_found = False
 
     file = request.files.get("file")
@@ -84,6 +92,7 @@ def analyze():
                     best_match = dfs[0].iloc[0]["identity"]
                     # e.g., "known_faces/MONICA.jpg" -> "MONICA"
                     identified_person = os.path.basename(best_match).split('.')[0]
+                    match_image_file = os.path.basename(best_match)
                     criminal_record_found = True
             except Exception as e:
                 print(f"Face ID error (Image): {e}")
@@ -133,11 +142,9 @@ def analyze():
                     break
                 frame_count += 1
 
-                # --- FACE IDENTIFICATION (first frame only) ---
-                if not first_frame_analyzed:
+                # --- FACE IDENTIFICATION (Check every 30 frames until a match is found) ---
+                if identified_person == "Unknown" and frame_count % 30 == 0:
                     try:
-                        # Convert BGR to RGB for deepface if required, but deepface handles files well. 
-                        # We can just save the very first frame to a temp file and run deepface.
                         temp_face_path = os.path.join(STATIC_FOLDER, "temp_face.jpg")
                         cv2.imwrite(temp_face_path, frame)
                         
@@ -145,11 +152,10 @@ def analyze():
                         if len(dfs) > 0 and len(dfs[0]) > 0:
                             best_match = dfs[0].iloc[0]["identity"]
                             identified_person = os.path.basename(best_match).split('.')[0]
+                            match_image_file = os.path.basename(best_match)
                             criminal_record_found = True
                     except Exception as e:
-                        print(f"Face ID error (Video): {e}")
-                    finally:
-                        first_frame_analyzed = True
+                        print(f"Face ID error (Video at frame {frame_count}): {e}")
 
                 # Lowered confidence to 0.20 to catch weak model detections
                 results = model(frame, conf=0.20)
@@ -195,6 +201,7 @@ def analyze():
         "snapshot_files": snapshot_files,
         "original_filename": original_filename,
         "identified_person": identified_person,
+        "match_image_file": match_image_file,
         "criminal_record_found": criminal_record_found,
     }
     return redirect(url_for("results"))
@@ -212,6 +219,7 @@ def results():
         snapshot_files=data.get("snapshot_files", []),
         original_filename=data.get("original_filename", ""),
         identified_person=data.get("identified_person", "Unknown"),
+        match_image_file=data.get("match_image_file"),
         criminal_record_found=data.get("criminal_record_found", False),
     )
 

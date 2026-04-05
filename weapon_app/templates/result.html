@@ -307,6 +307,27 @@
     .orange .banner-pill { background: var(--orange); color: #fff; box-shadow: 0 4px 12px rgba(234,88,12,0.3); }
     .green  .banner-pill { background: var(--green);  color: #fff; box-shadow: 0 4px 12px rgba(21,128,61,0.3); }
 
+    /* Match Photo Styling */
+    .banner-match-photo {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 3px solid #ffffff;
+      box-shadow: var(--shadow-md);
+      background: var(--slate-100);
+      display: grid;
+      place-items: center;
+    }
+
+    .match-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+
     /* ═══════════════════════════════════════════
        STATS ROW
     ═══════════════════════════════════════════ */
@@ -718,11 +739,20 @@
         <div class="banner-icon-wrap">
           {% if criminal_record_found %}🚔{% else %}👤{% endif %}
         </div>
+        
+        {% if match_image_file %}
+        <div class="banner-match-photo">
+            <img src="{{ url_for('serve_known_face', filename=match_image_file) }}" class="match-img" alt="Suspect Reference Photo">
+        </div>
+        {% endif %}
+
         <div class="banner-text">
           <div class="banner-eyebrow">
             {% if criminal_record_found %}Criminal Record Match Found{% else %}Identity Verified{% endif %}
           </div>
-          <div class="banner-title">Identity: {{ identified_person }}</div>
+          <div class="banner-title">
+            {% if criminal_record_found %}Suspect Identified: {{ identified_person }}{% else %}Identity: {{ identified_person }}{% endif %}
+          </div>
           <div class="banner-desc">
             {% if criminal_record_found %}This individual is registered in the known criminal records database. Exercise extreme caution.{% else %}This individual was identified but has no known criminal records.{% endif %}
           </div>
