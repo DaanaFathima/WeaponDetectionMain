@@ -1,96 +1,1324 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Weapon Threat Detection System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="ThreatScan — Enterprise-grade AI weapon detection. Upload images or videos for instant, accurate threat classification.">
+  <title>ThreatScan — AI Weapon Detection System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --white: #ffffff;
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-2: #f0f2f5;
+      --border: #e4e7ec;
+      --border-2: #d0d5dd;
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-        }
+      --slate-900: #101828;
+      --slate-700: #344054;
+      --slate-500: #667085;
+      --slate-300: #d0d5dd;
+      --slate-100: #f2f4f7;
 
-        h2 {
-            margin-bottom: 20px;
-        }
+      --blue-700: #1849a9;
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #d1e0ff;
+      --blue-50: #eff4ff;
+      --violet-600: #2563eb;
+      --violet-100: #d1e0ff;
 
-        form {
-            margin-bottom: 30px;
-        }
+      --grad-hero: linear-gradient(135deg, #2563eb 0%, #1849a9 100%);
+      --grad-btn: linear-gradient(135deg, #2563eb 0%, #1d6ae5 100%);
 
-        input[type="file"] {
-            padding: 8px;
-        }
+      --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+      --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.10), 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-md: 0 4px 8px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.04);
+      --shadow-lg: 0 12px 30px rgba(16, 24, 40, 0.10), 0 4px 8px rgba(16, 24, 40, 0.05);
+      --shadow-xl: 0 20px 48px rgba(16, 24, 40, 0.12);
 
-        button {
-            padding: 8px 15px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
 
-        img, video {
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-        }
+      --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        .alert-box {
-            padding: 15px;
-            margin-top: 25px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 8px;
-            color: white;
-            width: 60%;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .green { background-color: #28a745; }
-        .red { background-color: #dc3545; }
-        .orange { background-color: #fd7e14; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        .snapshot-title {
-            margin-top: 30px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #dc3545;
-        }
-    </style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--slate-700);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═══════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════ */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* Brand */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--grad-hero);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .logo-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--grad-hero);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .brand-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-name em {
+      font-style: normal;
+      background: var(--grad-btn);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Nav center — info buttons */
+    .nav-info-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Info toggle button — styled as outlined pill button */
+    .info-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-2);
+      color: var(--slate-700);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-xs);
+      user-select: none;
+    }
+
+    .info-btn:hover {
+      background: var(--blue-50);
+      border-color: var(--blue-500);
+      color: var(--blue-600);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-btn.active {
+      background: var(--blue-600);
+      border-color: var(--blue-600);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .info-btn .btn-icon {
+      font-size: 14px;
+    }
+
+    .info-btn .chevron {
+      font-size: 9px;
+      transition: transform 0.22s ease;
+      opacity: 0.6;
+    }
+
+    .info-btn.active .chevron {
+      transform: rotate(180deg);
+      opacity: 1;
+    }
+
+    /* ── Dropdown card ── */
+    .info-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      width: 340px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .info-dropdown.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Arrow pointer */
+    .info-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 13px;
+      height: 13px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      border-radius: 2px 0 0 0;
+    }
+
+    .dropdown-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dropdown-header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .dropdown-header-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    .dropdown-header-sub {
+      font-size: 11.5px;
+      color: var(--slate-500);
+      margin-top: 1px;
+    }
+
+    .dropdown-body {
+      padding: 14px 20px 18px;
+    }
+
+    /* ── Threat level rows inside dropdown ── */
+    .tl-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tl-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      transition: var(--transition);
+    }
+
+    .tl-row:hover {
+      background: var(--blue-50);
+      border-color: var(--blue-100);
+    }
+
+    .tl-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .tl-icon.red {
+      background: #fef2f2;
+    }
+
+    .tl-icon.orange {
+      background: #fff7ed;
+    }
+
+    .tl-icon.green {
+      background: #f0fdf4;
+    }
+
+    .tl-info {
+      flex: 1;
+    }
+
+    .tl-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 2px;
+    }
+
+    .tl-detail {
+      font-size: 11.5px;
+      color: var(--slate-500);
+    }
+
+    .tl-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .tl-chip.red {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .tl-chip.orange {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+    }
+
+    .tl-chip.green {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* ── How it works steps inside dropdown ── */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .step-row:last-child {
+      border-bottom: none;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--grad-btn);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.30);
+      margin-top: 1px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      font-size: 11.5px;
+      color: var(--slate-500);
+      line-height: 1.5;
+    }
+
+    /* Nav right */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .nav-page-link {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--slate-500);
+      text-decoration: none;
+      padding: 6px 13px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .nav-page-link:hover {
+      background: var(--slate-100);
+      color: var(--slate-900);
+    }
+
+    .nav-page-link.active {
+      color: var(--blue-600);
+      background: var(--blue-50);
+      font-weight: 600;
+    }
+
+    .badge-live {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 30px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: liveGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes liveGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+      }
+
+      50% {
+        box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    .hero {
+      text-align: center;
+      padding: 72px 32px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(ellipse at center,
+          rgba(59, 130, 246, 0.10) 0%,
+          rgba(124, 58, 237, 0.07) 40%,
+          transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--blue-100);
+      background: var(--blue-50);
+      color: var(--blue-600);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 30px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(32px, 5.5vw, 56px);
+      font-weight: 800;
+      color: var(--slate-900);
+      line-height: 1.10;
+      letter-spacing: -2px;
+      margin-bottom: 18px;
+      max-width: 660px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Logo + title inline */
+    .hero-title-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .hero-logo-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--grad-hero);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.30);
+      flex-shrink: 0;
+    }
+
+    .hero h1 .grad {
+      background: var(--grad-btn);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 16.5px;
+      color: var(--slate-500);
+      line-height: 1.70;
+      max-width: 520px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-pills {
+      display: inline-flex;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 5px 7px;
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 17px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate-700);
+      border-right: 1px solid var(--border);
+    }
+
+    .hero-pill:last-child {
+      border-right: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       UPLOAD SECTION (full-width single column)
+    ═══════════════════════════════════════════ */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 32px 90px;
+    }
+
+    .upload-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .upload-card-top {
+      background: #f0f4ff;
+      border-bottom: 1px solid #d1e0ff;
+      padding: 26px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-card-top::after {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .upload-card-top::before {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      right: 60px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.04);
+    }
+
+    .uct-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--blue-600);
+      margin-bottom: 6px;
+      opacity: 0.7;
+    }
+
+    .uct-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+    }
+
+    .uct-sub {
+      font-size: 13px;
+      color: var(--slate-500);
+    }
+
+    .upload-card-body {
+      padding: 28px 32px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border-2);
+      border-radius: var(--radius-md);
+      padding: 52px 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--bg);
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--blue-500);
+      background: var(--blue-50);
+    }
+
+    .drop-zone input[type="file"] {
+      display: none;
+    }
+
+    .dz-graphic {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--blue-50) 0%, var(--violet-100) 100%);
+      border: 1px solid var(--blue-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 18px;
+      transition: var(--transition);
+    }
+
+    .drop-zone:hover .dz-graphic {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+    }
+
+    .dz-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 5px;
+    }
+
+    .dz-link {
+      color: var(--blue-600);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .dz-sub {
+      font-size: 12.5px;
+      color: var(--slate-500);
+    }
+
+    .format-row {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .fmt-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--slate-500);
+      letter-spacing: 0.3px;
+    }
+
+    /* File preview */
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-top: 14px;
+    }
+
+    .file-preview.show {
+      display: flex;
+    }
+
+    .fp-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .fp-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .fp-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fp-size {
+      font-size: 11px;
+      color: var(--slate-500);
+      margin-top: 1px;
+    }
+
+    .fp-clear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--slate-400);
+      font-size: 18px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .fp-clear:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* CTA */
+    .btn-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px 24px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--grad-btn);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38);
+      letter-spacing: 0.2px;
+    }
+
+    .btn-cta:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(37, 99, 235, 0.50);
+    }
+
+    .btn-cta:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-cta:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-cta .btn-arrow {
+      font-size: 18px;
+      transition: transform 0.2s;
+    }
+
+    .btn-cta:hover .btn-arrow {
+      transform: translateX(3px);
+    }
+
+    .security-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--slate-500);
+    }
+
+    /* ═══════════════════════════════════════════
+       LOADING OVERLAY
+    ═══════════════════════════════════════════ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.90);
+      backdrop-filter: blur(8px);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .overlay-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 44px 52px;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+      max-width: 380px;
+      width: 90%;
+    }
+
+    .spinner-wrap {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 24px;
+    }
+
+    .spinner-ring {
+      width: 68px;
+      height: 68px;
+      border: 4px solid var(--blue-100);
+      border-top-color: var(--blue-600);
+      border-right-color: var(--violet-600);
+      border-radius: 50%;
+      animation: spin 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .overlay-icon {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+    }
+
+    .overlay-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 8px;
+    }
+
+    .overlay-sub {
+      font-size: 13.5px;
+      color: var(--slate-500);
+      line-height: 1.55;
+    }
+
+    .overlay-progress {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .overlay-bar {
+      height: 100%;
+      background: var(--grad-btn);
+      border-radius: 2px;
+      animation: progressAnim 3s ease-in-out infinite;
+    }
+
+    @keyframes progressAnim {
+      0% {
+        width: 0%;
+        opacity: 1;
+      }
+
+      70% {
+        width: 85%;
+        opacity: 1;
+      }
+
+      100% {
+        width: 90%;
+        opacity: 0.8;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--slate-700);
+      text-decoration: none;
+    }
+
+    .logo-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--grad-hero);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .footer-copy {
+      font-size: 12.5px;
+      color: var(--slate-500);
+    }
+
+    /* Backdrop to close dropdown on outside click */
+    #dropdownBackdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+    }
+
+    #dropdownBackdrop.show {
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
 
-    <h2>Weapon Threat Detection System</h2>
+  <!-- Invisible backdrop to close dropdowns -->
+  <div id="dropdownBackdrop" onclick="closeAllDropdowns()"></div>
 
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Analyze</button>
-    </form>
+  <!-- Loading overlay -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="spinner-wrap">
+        <div class="spinner-ring"></div>
+        <div class="overlay-icon">🔍</div>
+      </div>
+      <div class="overlay-title">Analyzing Media</div>
+      <div class="overlay-sub">Our AI model is scanning every frame<br>for potential weapon threats…</div>
+      <div class="overlay-progress">
+        <div class="overlay-bar"></div>
+      </div>
+    </div>
+  </div>
 
-    {% if result_file %}
-        <h3>Detection Result:</h3>
+  <!-- ══════════ NAVBAR ══════════ -->
+  <nav class="navbar">
+    <div class="nav-inner">
 
-        {% if is_video %}
-            <video width="600" controls>
-                <source src="{{ url_for('static', filename=result_file) }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        {% else %}
-            <img src="{{ url_for('static', filename=result_file) }}" width="500">
-        {% endif %}
+      <!-- Brand -->
+      <a href="/" class="nav-brand">
+        <div class="nav-logo">🛡️</div>
+        <span class="brand-name">Threat<em>Scan</em></span>
+      </a>
 
-        {% if snapshot_file %}
-            <div class="snapshot-title">🚨 Threat Snapshot</div>
-            <img src="{{ url_for('static', filename=snapshot_file) }}" width="500">
-        {% endif %}
+      <!-- Info buttons with dropdowns -->
+      <div class="nav-info-group">
 
-        <div class="alert-box {{ color }}">
-            {{ threat }}
+        <!-- Button 1: Threat Classification -->
+        <div style="position:relative;">
+          <button class="info-btn" id="btnThreat" onclick="toggleDropdown('ddThreat','btnThreat')">
+            <span class="btn-icon">📊</span>
+            Threat Classification
+            <span class="chevron">▼</span>
+          </button>
+
+          <div class="info-dropdown" id="ddThreat">
+            <div class="dropdown-header">
+              <div class="dropdown-header-icon">📊</div>
+              <div>
+                <div class="dropdown-header-title">Threat Classification</div>
+                <div class="dropdown-header-sub">How detected threats are categorised</div>
+              </div>
+            </div>
+            <div class="dropdown-body">
+              <div class="tl-list">
+                <div class="tl-row">
+                  <div class="tl-icon red">🔫</div>
+                  <div class="tl-info">
+                    <div class="tl-name">High Threat</div>
+                    <div class="tl-detail">A firearm or gun has been detected. Immediate attention may be required.
+                    </div>
+                  </div>
+                  <div class="tl-chip red">HIGH</div>
+                </div>
+                <div class="tl-row">
+                  <div class="tl-icon orange">🔪</div>
+                  <div class="tl-info">
+                    <div class="tl-name">Medium Threat</div>
+                    <div class="tl-detail">A knife or bladed weapon was found. Exercise caution.</div>
+                  </div>
+                  <div class="tl-chip orange">MED</div>
+                </div>
+                <div class="tl-row">
+                  <div class="tl-icon green">✅</div>
+                  <div class="tl-info">
+                    <div class="tl-name">No Threat</div>
+                    <div class="tl-detail">No weapons identified. The environment appears safe.</div>
+                  </div>
+                  <div class="tl-chip green">SAFE</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    {% endif %}
 
+        <!-- Button 2: How It Works -->
+        <div style="position:relative;">
+          <button class="info-btn" id="btnHowItWorks" onclick="toggleDropdown('ddHowItWorks','btnHowItWorks')">
+            <span class="btn-icon">⚙️</span>
+            How It Works
+            <span class="chevron">▼</span>
+          </button>
+
+          <div class="info-dropdown" id="ddHowItWorks">
+            <div class="dropdown-header">
+              <div class="dropdown-header-icon">⚙️</div>
+              <div>
+                <div class="dropdown-header-title">How It Works</div>
+                <div class="dropdown-header-sub">4-step detection pipeline</div>
+              </div>
+            </div>
+            <div class="dropdown-body">
+              <div class="step-list">
+                <div class="step-row">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <div class="step-title">Upload Media</div>
+                    <div class="step-desc">Choose an image (JPG/PNG) or video (MP4/AVI/MOV) from your device.</div>
+                  </div>
+                </div>
+                <div class="step-row">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <div class="step-title">AI Scanning</div>
+                    <div class="step-desc">YOLOv8 analyses every frame at ≥25% confidence to detect weapons.</div>
+                  </div>
+                </div>
+                <div class="step-row">
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <div class="step-title">Annotation</div>
+                    <div class="step-desc">Detected objects are highlighted with labelled bounding boxes.</div>
+                  </div>
+                </div>
+                <div class="step-row">
+                  <div class="step-num">4</div>
+                  <div class="step-content">
+                    <div class="step-title">Threat Report</div>
+                    <div class="step-desc">Threat level is classified (High / Medium / Safe) and displayed.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /nav-info-group -->
+
+      <!-- Right side -->
+      <div class="nav-right">
+        <a href="/" class="nav-page-link active">Detection</a>
+        <a href="/results" class="nav-page-link">Results</a>
+        <div class="badge-live">
+          <div class="live-dot"></div>
+          System Online
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero">
+    <h1 class="hero-title-row">
+      <div class="hero-logo-icon">🛡️</div><span class="grad">Threat Scan</span>
+    </h1>
+    <p class="hero-desc">
+      Real Time Weapon Detection and Suspect Identification using AI-powered YOLOv8.
+    </p>
+    <div class="hero-pills">
+      <div class="hero-pill">🔫 Gun Detection</div>
+      <div class="hero-pill">🔪 Knife Detection</div>
+      <div class="hero-pill">🎬 Video Support</div>
+      <div class="hero-pill">⚡ Fast Results</div>
+    </div>
+  </section>
+
+  <!-- ══════════ UPLOAD ══════════ -->
+  <div class="container">
+    <div class="upload-card">
+      <div class="upload-card-top">
+        <div class="uct-eyebrow">Step 1 of 1</div>
+        <div class="uct-title">Upload Your Media File</div>
+        <div class="uct-sub">Drag &amp; drop or browse — images and videos accepted</div>
+      </div>
+      <div class="upload-card-body">
+        <form id="uploadForm" method="POST" action="/analyze" enctype="multipart/form-data"
+          onsubmit="return handleSubmit()">
+
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" name="file" required accept=".jpg,.jpeg,.png,.mp4,.avi,.mov"
+              onchange="handleFileChange(this)">
+            <div class="dz-graphic">📁</div>
+            <div class="dz-title">
+              <a class="dz-link" href="#">Click to browse</a> or drag &amp; drop
+            </div>
+            <div class="dz-sub" style="margin-top:4px;">Images and videos supported</div>
+            <div class="format-row">
+              <span class="fmt-tag">JPG</span>
+              <span class="fmt-tag">PNG</span>
+              <span class="fmt-tag">MP4</span>
+              <span class="fmt-tag">AVI</span>
+              <span class="fmt-tag">MOV</span>
+            </div>
+          </div>
+
+          <div class="file-preview" id="filePreview">
+            <div class="fp-icon" id="fpIcon">📄</div>
+            <div class="fp-body">
+              <div class="fp-name" id="fpName">—</div>
+              <div class="fp-size" id="fpSize">—</div>
+            </div>
+            <button type="button" class="fp-clear" onclick="clearFile()" title="Remove">✕</button>
+          </div>
+
+          <button class="btn-cta" type="submit" id="analyzeBtn">
+            Run Threat Analysis
+            <span class="btn-arrow">→</span>
+          </button>
+
+          <div class="security-note">
+            🔒 Files are processed locally and never shared externally
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer>
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">
+        <div class="logo-sm">🛡️</div>
+        ThreatScan
+      </a>
+      <div class="footer-copy">© 2024 ThreatScan — AI Weapon Detection System · Powered by YOLOv8</div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Dropdown logic ───────────────────────────────────── */
+    const backdrop = document.getElementById('dropdownBackdrop');
+
+    function toggleDropdown(ddId, btnId) {
+      const dd = document.getElementById(ddId);
+      const btn = document.getElementById(btnId);
+      const isOpen = dd.classList.contains('open');
+
+      // close all first
+      closeAllDropdowns();
+
+      if (!isOpen) {
+        dd.classList.add('open');
+        btn.classList.add('active');
+        backdrop.classList.add('show');
+      }
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.info-dropdown').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.info-btn').forEach(b => b.classList.remove('active'));
+      backdrop.classList.remove('show');
+    }
+
+    /* ── Drag & Drop ──────────────────────────────────────── */
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fpName = document.getElementById('fpName');
+    const fpSize = document.getElementById('fpSize');
+    const fpIcon = document.getElementById('fpIcon');
+
+    ['dragenter', 'dragover'].forEach(ev => {
+      dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+      dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
+    });
+    dropZone.addEventListener('drop', e => {
+      const f = e.dataTransfer.files[0];
+      if (f) { fileInput.files = e.dataTransfer.files; showFile(f); }
+    });
+
+    function handleFileChange(input) {
+      if (input.files.length) showFile(input.files[0]);
+    }
+
+    function showFile(f) {
+      fpName.textContent = f.name;
+      fpSize.textContent = fmtSize(f.size);
+      fpIcon.textContent = f.type.startsWith('video') ? '🎬' : '🖼️';
+      filePreview.classList.add('show');
+    }
+
+    function clearFile() {
+      fileInput.value = '';
+      filePreview.classList.remove('show');
+    }
+
+    function fmtSize(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+      return (b / 1048576).toFixed(1) + ' MB';
+    }
+
+    /* ── Submit ───────────────────────────────────────────── */
+    function handleSubmit() {
+      if (!fileInput.files.length) return false;
+      document.getElementById('overlay').classList.add('show');
+      document.getElementById('analyzeBtn').disabled = true;
+      return true;
+    }
+  </script>
 </body>
+
 </html>

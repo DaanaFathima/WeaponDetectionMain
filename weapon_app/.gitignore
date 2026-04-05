@@ -1,0 +1,23 @@
+# Virtual environment
+Env/
+venv/
+.env
+
+# Flask uploads and static results
+uploads/
+static/*.mp4
+static/*.jpg
+static/*.png
+!static/temp_face.jpg
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Models and runs
+runs/
+bestold.pt
+
+
+# known_faces/ is NOT ignored.
