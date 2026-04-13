@@ -13,38 +13,38 @@
     rel="stylesheet">
   <style>
     /* ═══════════════════════════════════════════
-       TOKENS
+       TOKENS — DARK THEME
     ═══════════════════════════════════════════ */
     :root {
       --white: #ffffff;
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --surface-2: #f0f2f5;
-      --border: #e4e7ec;
-      --border-2: #d0d5dd;
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #1c2230;
+      --border: #21262d;
+      --border-2: #30363d;
 
-      --slate-900: #101828;
-      --slate-700: #344054;
-      --slate-500: #667085;
-      --slate-300: #d0d5dd;
-      --slate-100: #f2f4f7;
+      --slate-900: #e6edf3;
+      --slate-700: #c9d1d9;
+      --slate-500: #8b949e;
+      --slate-300: #30363d;
+      --slate-100: #1c2230;
 
-      --blue-700: #1849a9;
-      --blue-600: #2563eb;
-      --blue-500: #3b82f6;
-      --blue-100: #d1e0ff;
-      --blue-50: #eff4ff;
-      --violet-600: #2563eb;
-      --violet-100: #d1e0ff;
+      --blue-700: #58a6ff;
+      --blue-600: #4493f8;
+      --blue-500: #3fb1f5;
+      --blue-100: #1d3557;
+      --blue-50: #0d1f38;
+      --violet-600: #7c5cbf;
+      --violet-100: #1a1535;
 
-      --grad-hero: linear-gradient(135deg, #2563eb 0%, #1849a9 100%);
-      --grad-btn: linear-gradient(135deg, #2563eb 0%, #1d6ae5 100%);
+      --grad-hero: linear-gradient(135deg, #3fb1f5 0%, #4493f8 50%, #7c5cbf 100%);
+      --grad-btn:  linear-gradient(135deg, #3fb1f5 0%, #4493f8 100%);
 
-      --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
-      --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.10), 0 1px 2px rgba(16, 24, 40, 0.06);
-      --shadow-md: 0 4px 8px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.04);
-      --shadow-lg: 0 12px 30px rgba(16, 24, 40, 0.10), 0 4px 8px rgba(16, 24, 40, 0.05);
-      --shadow-xl: 0 20px 48px rgba(16, 24, 40, 0.12);
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.40);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.30);
+      --shadow-md: 0 4px 8px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.25);
+      --shadow-lg: 0 12px 30px rgba(0,0,0,0.50), 0 4px 8px rgba(0,0,0,0.30);
+      --shadow-xl: 0 20px 48px rgba(0,0,0,0.60);
 
       --radius-sm: 8px;
       --radius-md: 14px;
@@ -81,11 +81,11 @@
       position: sticky;
       top: 0;
       z-index: 200;
-      background: rgba(255, 255, 255, 0.90);
+      background: rgba(13, 17, 23, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-xs);
+      box-shadow: 0 1px 0 rgba(63, 177, 245, 0.08);
     }
 
     .nav-inner {
@@ -175,15 +175,15 @@
     .info-btn:hover {
       background: var(--blue-50);
       border-color: var(--blue-500);
-      color: var(--blue-600);
-      box-shadow: var(--shadow-sm);
+      color: var(--blue-500);
+      box-shadow: 0 0 12px rgba(63,177,245,0.15);
     }
 
     .info-btn.active {
-      background: var(--blue-600);
-      border-color: var(--blue-600);
+      background: var(--grad-btn);
+      border-color: var(--blue-500);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 4px 14px rgba(63,177,245,0.35);
     }
 
     .info-btn .btn-icon {
@@ -448,9 +448,9 @@
       display: flex;
       align-items: center;
       gap: 7px;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #15803d;
+      background: rgba(34,197,94,0.10);
+      border: 1px solid rgba(34,197,94,0.30);
+      color: #4ade80;
       font-size: 12px;
       font-weight: 600;
       padding: 6px 14px;
@@ -496,8 +496,8 @@
       width: 700px;
       height: 400px;
       background: radial-gradient(ellipse at center,
-          rgba(59, 130, 246, 0.10) 0%,
-          rgba(124, 58, 237, 0.07) 40%,
+          rgba(63,177,245,0.18) 0%,
+          rgba(124,92,191,0.12) 40%,
           transparent 70%);
       pointer-events: none;
     }
@@ -506,9 +506,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid var(--blue-100);
-      background: var(--blue-50);
-      color: var(--blue-600);
+      border: 1px solid rgba(63,177,245,0.30);
+      background: rgba(63,177,245,0.08);
+      color: #3fb1f5;
       font-size: 12.5px;
       font-weight: 600;
       padding: 6px 16px;
@@ -604,13 +604,13 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-lg), 0 0 40px rgba(63,177,245,0.06);
       overflow: hidden;
     }
 
     .upload-card-top {
-      background: #f0f4ff;
-      border-bottom: 1px solid #d1e0ff;
+      background: linear-gradient(135deg, #0d1f38 0%, #1a1535 100%);
+      border-bottom: 1px solid rgba(63,177,245,0.20);
       padding: 26px 32px;
       position: relative;
       overflow: hidden;
@@ -861,7 +861,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(248, 250, 252, 0.90);
+      background: rgba(13, 17, 23, 0.92);
       backdrop-filter: blur(8px);
       z-index: 500;
       flex-direction: column;
@@ -966,7 +966,7 @@
        FOOTER
     ═══════════════════════════════════════════ */
     footer {
-      background: var(--surface);
+      background: #0a0e14;
       border-top: 1px solid var(--border);
     }
 

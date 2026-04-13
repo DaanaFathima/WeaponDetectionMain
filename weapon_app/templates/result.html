@@ -12,40 +12,40 @@
        TOKENS (mirrored from index)
     ═══════════════════════════════════════════ */
     :root {
-      --white:       #ffffff;
-      --bg:          #f5f7fa;
-      --surface:     #ffffff;
-      --surface-2:   #f0f2f5;
-      --border:      #e4e7ec;
-      --border-2:    #d0d5dd;
+      --white:       #f8fafc;
+      --bg:          #050814;
+      --surface:     #0e172e;
+      --surface-2:   #121d35;
+      --border:      rgba(255,255,255,0.08);
+      --border-2:    rgba(255,255,255,0.05);
 
-      --slate-900:   #101828;
-      --slate-700:   #344054;
-      --slate-500:   #667085;
-      --slate-300:   #d0d5dd;
-      --slate-100:   #f2f4f7;
+      --slate-900:   #f8fafc;
+      --slate-700:   #e2e8f0;
+      --slate-500:   #94a3b8;
+      --slate-300:   #64748b;
+      --slate-100:   #334155;
 
-      --blue-700:    #1849a9;
-      --blue-600:    #2563eb;
-      --blue-500:    #3b82f6;
-      --blue-100:    #d1e0ff;
-      --blue-50:     #eff4ff;
-      --violet-600:  #2563eb;
-      --violet-100:  #d1e0ff;
+      --blue-700:    #60a5fa;
+      --blue-600:    #38bdf8;
+      --blue-500:    #22d3ee;
+      --blue-100:    rgba(59,130,246,0.12);
+      --blue-50:     rgba(59,130,246,0.08);
+      --violet-600:  #4338ca;
+      --violet-100:  rgba(99,102,241,0.14);
 
       /* Threat palette */
-      --red:         #d92d20;
-      --red-bg:      #fff1f0;
-      --red-border:  #fecdca;
-      --orange:      #c4320a;
-      --orange-bg:   #fff6ee;
-      --orange-border:#f9dbaf;
-      --green:       #067647;
-      --green-bg:    #f0fdf4;
-      --green-border:#abefc6;
+      --red:         #f87171;
+      --red-bg:      #450b0b;
+      --red-border:  #7f1d1d;
+      --orange:      #fb923c;
+      --orange-bg:   #4d250f;
+      --orange-border:#7c2d12;
+      --green:       #86efac;
+      --green-bg:    #0f2f1a;
+      --green-border:#16532b;
 
-      --grad-hero:   linear-gradient(135deg, #2563eb 0%, #1849a9 100%);
-      --grad-btn:    linear-gradient(135deg, #2563eb 0%, #1d6ae5 100%);
+      --grad-hero:   linear-gradient(135deg, #38bdf8 0%, #1d4ed8 100%);
+      --grad-btn:    linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 
       --shadow-xs:   0 1px 2px rgba(16,24,40,0.05);
       --shadow-sm:   0 1px 3px rgba(16,24,40,0.10), 0 1px 2px rgba(16,24,40,0.06);
@@ -66,7 +66,9 @@
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg);
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 18%),
+                  radial-gradient(circle at 85% 12%, rgba(99, 102, 241, 0.10), transparent 20%),
+                  var(--bg);
       color: var(--slate-700);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
@@ -79,7 +81,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255,255,255,0.88);
+      background: rgba(15, 23, 46, 0.92);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--border);
@@ -148,8 +150,8 @@
       transition: var(--transition);
     }
 
-    .nav-link:hover { background: var(--slate-100); color: var(--slate-900); }
-    .nav-link.active { color: var(--blue-600); background: var(--blue-50); }
+    .nav-link:hover { background: var(--blue-50); color: var(--white); }
+    .nav-link.active { color: var(--white); background: rgba(59,130,246,0.16); }
 
     .nav-right { display: flex; align-items: center; gap: 10px; }
 
@@ -172,8 +174,9 @@
     }
 
     .btn-back:hover {
-      background: var(--slate-100);
-      border-color: var(--border-2);
+      background: rgba(59,130,246,0.12);
+      border-color: rgba(59,130,246,0.20);
+      color: var(--white);
       box-shadow: var(--shadow-sm);
     }
 
@@ -846,7 +849,10 @@
           <img src="{{ url_for('static', filename=file) }}" alt="Snapshot frame where a weapon was detected">
         </div>
         <div class="mc-footer">
-          📍 Captured at a discrete detection event
+          <span>📍 Captured at a discrete detection event</span>
+          <a href="{{ url_for('static', filename=file) }}" download class="btn-outline" style="margin-left:auto; padding: 8px 14px; font-size: 12px;">
+            ⬇ Download Snapshot
+          </a>
         </div>
       </div>
       {% endfor %}
