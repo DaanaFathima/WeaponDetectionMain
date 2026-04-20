@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 from ultralytics import YOLO
 import os
 import uuid
 import cv2
 import shutil
 from datetime import datetime
-from detection import identify_faces_in_image, identify_faces_in_video
+from detection import identify_faces_in_image, identify_faces_in_video, _build_recognizer, _detect_face_rects, _prepare_face, _predict, _draw_label
 
 app = Flask(__name__)
 
@@ -26,7 +26,7 @@ def index():
     alert_color = "green"
     result_file = None
     is_video = False
-    snapshot_file = None
+    snapshot_files = []
     identified_suspects = []     # NEW: list of identified suspect names
 
     if request.method == "POST":
@@ -102,22 +102,27 @@ def index():
                 out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
                 detected_ids_total = set()
-                snapshot_saved = False
+                frame_count = 0
+                last_snapshot_frame = -9999
 
                 while True:
                     ret, frame = cap.read()
                     if not ret:
                         break
+                    frame_count += 1
 
                     results = model(frame, conf=0.25)
                     detected_ids = [int(box.cls[0]) for box in results[0].boxes]
 
-                    if 0 in detected_ids and not snapshot_saved:
-                        snapshot_name = "snapshot_" + str(uuid.uuid4()) + ".jpg"
-                        snapshot_path = os.path.join(STATIC_FOLDER, snapshot_name)
-                        cv2.imwrite(snapshot_path, results[0].plot())
-                        snapshot_file = snapshot_name
-                        snapshot_saved = True
+                    # Detect gun (0) or knife (1). Save snapshot spaced out by at least 1 second (fps frames)
+                    weapon_detected = 0 in detected_ids or 1 in detected_ids
+                    if weapon_detected:
+                        if frame_count - last_snapshot_frame >= fps:
+                            snapshot_name = "snapshot_" + str(uuid.uuid4()) + ".jpg"
+                            snapshot_path = os.path.join(STATIC_FOLDER, snapshot_name)
+                            cv2.imwrite(snapshot_path, results[0].plot())
+                            snapshot_files.append(snapshot_name)
+                            last_snapshot_frame = frame_count
 
                     for cid in detected_ids:
                         detected_ids_total.add(cid)
@@ -167,9 +172,61 @@ def index():
         threat=threat_label,
         color=alert_color,
         is_video=is_video,
-        snapshot_file=snapshot_file,
+        snapshot_files=snapshot_files,
         identified_suspects=identified_suspects,
     )
+
+def gen_frames():
+    """Generator function for live camera feed with weapon & suspect detection."""
+    recognizer, label_map = _build_recognizer()
+    cap = cv2.VideoCapture(0)
+    frame_idx = 0
+    cached_faces = []
+
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+
+        # 1. Weapon Detection
+        results = model(frame, conf=0.25)
+        # Using results[0].plot() to automatically draw the bounding boxes for weapons
+        annotated_frame = results[0].plot()
+
+        # 2. Suspect Identification (run every 5 frames for performance)
+        if frame_idx % 5 == 0:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            rects = _detect_face_rects(gray)
+            cached_faces = []
+            for (x, y, w, h) in rects:
+                face_eq = _prepare_face(frame, x, y, w, h)
+                name = _predict(recognizer, label_map, face_eq)
+                cached_faces.append((x, y, w, h, name))
+
+        # Draw cached face bounding boxes on the annotated frame
+        for (x, y, w, h, name) in cached_faces:
+            _draw_label(annotated_frame, x, y, w, h, name)
+
+        frame_idx += 1
+
+        # Encode frame as JPEG
+        ret, buffer = cv2.imencode('.jpg', annotated_frame)
+        if not ret:
+            continue
+        
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    """Route that serves the MJPEG stream for the live camera."""
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/live')
+def live():
+    """Route that renders the live camera UI page."""
+    return render_template('live.html')
 
 
 if __name__ == "__main__":

@@ -702,7 +702,7 @@
       <span class="current">Analysis Results</span>
     </div>
 
-    {% if result_file %}
+    {% if result_file or snapshot_files %}
 
     <!-- Threat Banner -->
     <div class="threat-banner {{ color }}">
@@ -803,6 +803,7 @@
     <div class="results-grid {% if snapshot_files %}two-col{% endif %}">
 
       <!-- Main result -->
+      {% if result_file %}
       <div class="media-card">
         <div class="mc-header">
           <div class="mc-title">
@@ -830,6 +831,7 @@
           🔍 Bounding boxes and class labels are added by the YOLOv8 model
         </div>
       </div>
+      {% endif %}
 
       <!-- Snapshots (video detections) -->
       {% if snapshot_files %}

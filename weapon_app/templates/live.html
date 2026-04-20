@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreatScan — Live Camera</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #21262d;
+      --slate-900: #e6edf3;
+      --slate-700: #c9d1d9;
+      --slate-500: #8b949e;
+      --blue-600: #4493f8;
+      --blue-50: #0d1f38;
+      --grad-hero: linear-gradient(135deg, #3fb1f5 0%, #4493f8 50%, #7c5cbf 100%);
+      --grad-btn:  linear-gradient(135deg, #3fb1f5 0%, #4493f8 100%);
+      --radius-sm: 8px;
+      --radius-xl: 28px;
+      --shadow-lg: 0 12px 30px rgba(0,0,0,0.50), 0 4px 8px rgba(0,0,0,0.30);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--slate-700);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .nav-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--grad-hero);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 24px;
+      color: var(--slate-900);
+    }
+
+    .live-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      box-shadow: var(--shadow-lg), 0 0 40px rgba(63,177,245,0.06);
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .video-frame {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 20px 0;
+      border: 2px solid var(--border);
+      background: #000;
+      min-height: 400px;
+      position: relative;
+    }
+
+    .video-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: var(--slate-500);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-orange { background: #f97316; }
+    .dot-blue { background: #3b82f6; }
+
+    .btn-return {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--slate-700);
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-return:hover {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-row">
+    <div class="nav-logo">🛡️</div>
+    <h1>ThreatScan Live</h1>
+  </div>
+
+  <div class="live-container">
+    <div class="status-badge">🔴 LIVE SYSTEM ACTIVE</div>
+    
+    <div class="video-frame">
+      <img src="{{ url_for('video_feed') }}" alt="Live camera feed" />
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="dot dot-red"></div> High Threat (Gun / Suspect)</div>
+      <div class="legend-item"><div class="dot dot-orange"></div> Medium Threat (Knife)</div>
+    </div>
+
+    <a href="/stop_live" class="btn-return">⏹ Stop Camera & Return</a>
+  </div>
+</body>
+
+</html>
