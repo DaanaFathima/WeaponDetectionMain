@@ -2,14 +2,20 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from ultralytics import YOLO
 from deepface import DeepFace
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Silence TF info/warnings
+import torch
 import uuid
 import cv2
 
 app = Flask(__name__)
 app.secret_key = "threatscan_secret_2024"
 
-# Load trained YOLO model
+# Load trained YOLO model with automatic GPU/CPU selection
+device = 0 if torch.cuda.is_available() else 'cpu'
 model = YOLO("best.pt")
+model.to(device)
+print(f"Using device: {'GPU' if device == 0 else 'CPU'}")
 
 UPLOAD_FOLDER = "uploads"
 STATIC_FOLDER = "static"
@@ -98,7 +104,8 @@ def analyze():
                 print(f"Face ID error (Image): {e}")
 
             # Lowered confidence to 0.20 to catch weak model detections
-            results = model(upload_path, conf=0.20)
+            # Use imgsz=640 to match training and catch small weapons
+            results = model(upload_path, conf=0.20, imgsz=640)
             orig_img = results[0].orig_img.copy()
             result_img, detected_ids = process_detections(orig_img, results[0].boxes)
 
@@ -145,10 +152,8 @@ def analyze():
                 # --- FACE IDENTIFICATION (Check every 30 frames until a match is found) ---
                 if identified_person == "Unknown" and frame_count % 30 == 0:
                     try:
-                        temp_face_path = os.path.join(STATIC_FOLDER, "temp_face.jpg")
-                        cv2.imwrite(temp_face_path, frame)
-                        
-                        dfs = DeepFace.find(img_path=temp_face_path, db_path="known_faces", enforce_detection=False, silent=True)
+                        # Process frame directly in memory (no disk write)
+                        dfs = DeepFace.find(img_path=frame, db_path="known_faces", enforce_detection=False, silent=True)
                         if len(dfs) > 0 and len(dfs[0]) > 0:
                             best_match = dfs[0].iloc[0]["identity"]
                             identified_person = os.path.basename(best_match).split('.')[0]
@@ -157,8 +162,8 @@ def analyze():
                     except Exception as e:
                         print(f"Face ID error (Video at frame {frame_count}): {e}")
 
-                # Lowered confidence to 0.20 to catch weak model detections
-                results = model(frame, conf=0.20)
+                # Run YOLO with verbose=False for minor speed gain
+                results = model(frame, conf=0.20, imgsz=640, verbose=False)
                 annotated_frame, detected_ids = process_detections(frame.copy(), results[0].boxes)
 
                 # Check for Gun (0) or Knife (1) and save up to 5 distinct snapshots
@@ -225,4 +230,5 @@ def results():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # use_reloader=False prevents the library-triggered reload loop (VGGFace.py)
+    app.run(debug=True, use_reloader=False)
