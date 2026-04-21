@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, Response
 from ultralytics import YOLO
 from deepface import DeepFace
 import os
@@ -22,6 +22,9 @@ STATIC_FOLDER = "static"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(STATIC_FOLDER, exist_ok=True)
+
+# Global state to track live camera session
+live_session_data = {}
 
 
 @app.route("/", methods=["GET"])
@@ -47,14 +50,29 @@ def process_detections(img, boxes):
         
         w = x2 - x1
         h = y2 - y1
+        area = w * h
+        img_area = img_h * img_w
         
-        if cls_id == 0: # Gun class
+        # Gun (0) False Positive Filtering
+        if cls_id == 0: 
             # The model is confusing COCO Class 0 (Person) for Gun.
             # Relaxed ratio to > 2.0 (very tall and skinny) and > 40% height to ensure we don't accidentally ignore vertical guns
             if (h / max(w, 1)) > 2.0 and h > (img_h * 0.40):
                 continue
-            # Ignore massive bounding boxes (> 60% of image area) instead of 40%
-            if (w * h) > (img_h * img_w * 0.60):
+            # Ignore massive bounding boxes (> 40% of image area)
+            if area > (img_area * 0.40):
+                continue
+                
+        # Knife (1) False Positive Filtering
+        if cls_id == 1:
+            # False positives (like bedsheets) tend to be large, blocky squares.
+            # Real knives in a hand are typically small and elongated.
+            if area > (img_area * 0.15): # If it takes up >15% of the screen, it's not a knife.
+                continue
+                
+            # Check aspect ratio (knives are long/thin, not perfectly square)
+            aspect_ratio = max(w, h) / min(w, h) if min(w, h) > 0 else 1
+            if aspect_ratio < 1.2: # If it's perfectly square, ignore it
                 continue
                 
         detected_classes.append(cls_id)
@@ -142,6 +160,7 @@ def analyze():
             first_frame_analyzed = False
             last_snapshot_frame = -9999
             frame_count = 0
+            last_boxes = None
 
             while True:
                 ret, frame = cap.read()
@@ -162,13 +181,17 @@ def analyze():
                     except Exception as e:
                         print(f"Face ID error (Video at frame {frame_count}): {e}")
 
-                # Run YOLO with verbose=False for minor speed gain
-                results = model(frame, conf=0.20, imgsz=640, verbose=False)
-                annotated_frame, detected_ids = process_detections(frame.copy(), results[0].boxes)
+                # --- AI FRAME SKIPPING (Speed up by 3x) ---
+                # Run YOLO model only every 3rd frame to save massive processing time.
+                if frame_count % 3 == 0 or last_boxes is None:
+                    results = model(frame, conf=0.30, imgsz=640, verbose=False)
+                    last_boxes = results[0].boxes
 
-                # Check for Gun (0) or Knife (1) and save up to 5 distinct snapshots
+                annotated_frame, detected_ids = process_detections(frame.copy(), last_boxes)
+
+                # Check for Gun (0) or Knife (1) and save distinct snapshots
                 weapon_detected = 0 in detected_ids or 1 in detected_ids
-                if weapon_detected and len(snapshot_files) < 5:
+                if weapon_detected:
                     # Require at least 15 frames between snapshots so they aren't identical
                     if frame_count - last_snapshot_frame >= 15:
                         snapshot_name = "snapshot_" + str(uuid.uuid4()) + ".jpg"
@@ -227,6 +250,102 @@ def results():
         match_image_file=data.get("match_image_file"),
         criminal_record_found=data.get("criminal_record_found", False),
     )
+
+def gen_frames():
+    """Generator function for live camera feed with weapon & suspect detection."""
+    global live_session_data
+    cap = cv2.VideoCapture(0)
+    frame_count = 0
+    identified_person = "Unknown"
+    last_snapshot_frame = -9999
+
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        
+        frame_count += 1
+
+        # Suspect Identification (run every 30 frames for performance)
+        if identified_person == "Unknown" and frame_count % 30 == 0:
+            try:
+                # Need to write frame to disk temporarily for deepface if img_path=frame fails, 
+                # but DeepFace supports numpy array in newer versions.
+                dfs = DeepFace.find(img_path=frame, db_path="known_faces", enforce_detection=False, silent=True)
+                if len(dfs) > 0 and len(dfs[0]) > 0:
+                    best_match = dfs[0].iloc[0]["identity"]
+                    identified_person = os.path.basename(best_match).split('.')[0]
+                    live_session_data["identified_person"] = identified_person
+                    live_session_data["criminal_record_found"] = True
+            except Exception as e:
+                pass
+
+        # Weapon Detection
+        results = model(frame, conf=0.30, imgsz=640, verbose=False)
+        annotated_frame, detected_ids = process_detections(frame.copy(), results[0].boxes)
+
+        # Update threat snapshot and state
+        weapon_detected = 0 in detected_ids or 1 in detected_ids
+        if weapon_detected:
+            # Space out snapshots by at least 15 frames
+            if frame_count - last_snapshot_frame >= 15:
+                snapshot_name = "snapshot_live_" + str(uuid.uuid4()) + ".jpg"
+                snapshot_path = os.path.join(STATIC_FOLDER, snapshot_name)
+                cv2.imwrite(snapshot_path, annotated_frame)
+                live_session_data["snapshot_files"].append(snapshot_name)
+                last_snapshot_frame = frame_count
+
+            if 0 in detected_ids:
+                live_session_data["threat"] = "HIGH THREAT: Gun Detected in Live Camera"
+                live_session_data["color"] = "red"
+            elif 1 in detected_ids and live_session_data["color"] != "red":
+                live_session_data["threat"] = "MEDIUM THREAT: Knife Detected in Live Camera"
+                live_session_data["color"] = "orange"
+
+        # Overlay Suspect Name if identified
+        if identified_person != "Unknown":
+            cv2.putText(annotated_frame, f"SUSPECT: {identified_person}", (20, 40), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+
+        # Encode frame as JPEG
+        ret, buffer = cv2.imencode('.jpg', annotated_frame)
+        if not ret:
+            continue
+        
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    """Route that serves the MJPEG stream for the live camera."""
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/live')
+def live():
+    """Route that renders the live camera UI page."""
+    global live_session_data
+    # Reset session data for the new live session
+    live_session_data = {
+        "result_file": None,
+        "threat": "SAFE: No Weapon Detected",
+        "color": "green",
+        "is_video": True,
+        "snapshot_files": [],
+        "original_filename": "Live Camera Stream",
+        "identified_person": "Unknown",
+        "match_image_file": None,
+        "criminal_record_found": False
+    }
+    return render_template('live.html')
+
+@app.route('/stop_live')
+def stop_live():
+    """Route that stops the live session and redirects to results."""
+    global live_session_data
+    session["result"] = live_session_data
+    return redirect(url_for('results'))
+
 
 
 if __name__ == "__main__":

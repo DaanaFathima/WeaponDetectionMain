@@ -114,6 +114,10 @@
         <button type="submit">Analyze</button>
     </form>
 
+    <div style="margin-bottom: 30px;">
+        <a href="{{ url_for('live') }}" style="text-decoration: none; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 16px;">📹 Start Live Camera</a>
+    </div>
+
     {% if result_file %}
         <h3>Detection Result:</h3>
 
@@ -126,9 +130,13 @@
             <img src="{{ url_for('static', filename=result_file) }}" width="500">
         {% endif %}
 
-        {% if snapshot_file %}
-            <div class="snapshot-title">🚨 Threat Snapshot</div>
-            <img src="{{ url_for('static', filename=snapshot_file) }}" width="500">
+        {% if snapshot_files %}
+            <div class="snapshot-title">🚨 Threat Snapshots ({{ snapshot_files|length }})</div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px;">
+            {% for snap in snapshot_files %}
+                <img src="{{ url_for('static', filename=snap) }}" width="400" style="margin-top: 0; border: 2px solid #dc3545;">
+            {% endfor %}
+            </div>
         {% endif %}
 
         <div class="alert-box {{ color }}">
